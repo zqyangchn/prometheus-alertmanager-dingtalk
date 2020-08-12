@@ -1,0 +1,20 @@
+##################### dingtalk #####################
+listenUri: 0.0.0.0:8000
+logLevel: debug
+
+## DingTalk
+dingTalkUri: https://oapi.dingtalk.com/robot/send?access_token=XXXXXXX
+
+# Dingtalk Security Settings Type
+# 1. CustomKeywords		最多可以设置10个关键词，消息中至少包含其中1个关键词才可以发送成功
+# 2. Endorsement			加签, 需要提供 SecretKey
+# 3. IPAddressSegment		只有来自IP地址范围内的请求才会被正常处理
+securitySettingsType: Endorsement
+secretKey: SECXXXXXXX
+
+#templatePath: ./dingtalk.tmpl
+
+allowLables:
+  - severity
+  - description
+  - kubernetes_namespace

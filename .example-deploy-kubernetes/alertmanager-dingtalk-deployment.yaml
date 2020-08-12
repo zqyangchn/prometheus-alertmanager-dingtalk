@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus-alertmanager-dingtalk
+  namespace: kube-system
+  labels:
+    k8s-app: prometheus-alertmanager-dingtalk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: prometheus-alertmanager-dingtalk
+  template:
+    metadata:
+      labels:
+        k8s-app: prometheus-alertmanager-dingtalk
+    spec:
+      containers:
+      - name: prometheus-alertmanager-dingtalk
+        image: "reg.i-morefun.net/google_containers/prometheus-alertmanager-dingtalk:0.0.6"
+        imagePullPolicy: "IfNotPresent"
+        ports:
+          - containerPort: 8000
+        resources:
+          limits:
+            cpu: 10m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 50Mi
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8000
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: /healthy
+            port: 8000
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        volumeMounts:
+          - name: prometheus-alertmanager-dingtalk-config-volume
+            mountPath: /etc/prometheus-alertmanager-dingtalk
+            readOnly: true
+      volumes:
+        - name: prometheus-alertmanager-dingtalk-config-volume
+          configMap:
+            name: prometheus-alertmanager-dingtalk
