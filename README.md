@@ -15,11 +15,11 @@
     ..example-deploy-kubernetes
 
 ## 运行
-    docker run -p 50000:8000 -v /path/to/config.yaml:/etc/prometheus-alertmanager-dingtalk/config.yaml rewind/prometheus-alertmanager-dingtalk:0.0.3
+    docker run -p 50000:8000 -v /path/to/config.yaml:/etc/prometheus-alertmanager-dingtalk/config.yaml rewind/prometheus-alertmanager-dingtalk:0.0.6
 
 ## 构建镜像
-	docker build -f Dockerfile -t rewind/prometheus-alertmanager-dingtalk:0.0.5 . 
-	docker build -f Dockerfile -t reg.i-morefun.net/google_containers/prometheus-alertmanager-dingtalk:0.0.5 . 
+	docker build -f Dockerfile -t rewind/prometheus-alertmanager-dingtalk:0.0.6 . 
+	docker build -f Dockerfile -t reg.i-morefun.net/google_containers/prometheus-alertmanager-dingtalk:0.0.6 . 
 
 ## 二进制编译
 	./build mac|linux
