@@ -11,9 +11,13 @@ import (
 	"prometheus-alertmanager-dingtalk/zaplog"
 )
 
-var logger = zaplog.Get()
 
 func init() {
+	config.SetupInit()
+	zaplog.SetupInit()
+	dingtalk.SetupInit()
+
+
 	http.HandleFunc("/ready", dingtalk.HandlerReady)
 	http.HandleFunc("/healthy", dingtalk.HandlerHealthy)
 	http.HandleFunc("/dingtalk/alertmanager", dingtalk.HandlerAlertManager)
@@ -27,7 +31,7 @@ func main() {
 		WriteTimeout:      2 * time.Minute,
 	}
 
-	logger.Debug("ConfigSetting",
+	zaplog.Logger.Debug("ConfigSetting",
 		zap.String("uri", config.GetDingTalkUri()),
 		zap.String("securitySettingsType", config.GetSecuritySettingsType()),
 		zap.String("secretKey", config.GetSecretKey()),
@@ -35,7 +39,7 @@ func main() {
 		zap.Strings("allowLabels", config.GetAllowLables()),
 	)
 
-	logger.Info("Web Starting Completed !", zap.String("ListenUri", config.GetListenUri()))
+	zaplog.Logger.Info("Web Starting Completed !", zap.String("ListenUri", config.GetListenUri()))
 	if err := server.ListenAndServe(); err != nil {
 		panic(err.Error())
 	}

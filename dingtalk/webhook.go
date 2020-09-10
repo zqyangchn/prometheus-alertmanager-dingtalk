@@ -4,19 +4,17 @@ import (
 	"net/http"
 
 	"go.uber.org/zap"
+
+	"prometheus-alertmanager-dingtalk/zaplog"
 )
 
 var DefaultDingTalk *DingTalk
-
-func init() {
-	DefaultDingTalk = New()
-}
 
 // Handler AlertManager WebHook Request, Send Message To DingTalk
 func HandlerAlertManager(w http.ResponseWriter, r *http.Request) {
 	if err := DefaultDingTalk.SendAlertManagerMessage(r); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		logger.Warn("SendAlertManagerMessage Error", zap.Error(err))
+		zaplog.Logger.Warn("SendAlertManagerMessage Error", zap.Error(err))
 		return
 	}
 

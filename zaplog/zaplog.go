@@ -12,9 +12,13 @@ import (
 )
 
 var (
-	zapLogger   *zap.Logger
+	Logger   *zap.Logger
 	AtomicLevel zap.AtomicLevel
 )
+
+func SetupInit() {
+	Initialization(config.GetLogLevel(), config.GetLogOutput(), config.GetLogOutputFile())
+}
 
 func switchLogLevel(level string) zapcore.Level {
 	switch strings.ToLower(level) {
@@ -50,21 +54,10 @@ func switchLogOutput(LogOutput, LogOutputFile string) zapcore.WriteSyncer {
 	}
 }
 
-func init() {
-	Initialization(config.GetLogLevel(), config.GetLogOutput(), config.GetLogOutputFile())
-}
-
-func Get() *zap.Logger {
-	if zapLogger == nil {
-		Initialization(config.GetLogLevel(), config.GetLogOutput(), config.GetLogOutputFile())
-	}
-	return zapLogger
-}
-
 func Initialization(LogLevel, LogOutput, LogOutputFile string) *zap.Logger {
-	if zapLogger != nil {
-		zapLogger.Warn(" zapLogger already init ...")
-		return zapLogger
+	if Logger != nil {
+		Logger.Warn(" zapLogger already init ...")
+		return Logger
 	}
 
 	AtomicLevel = zap.NewAtomicLevelAt(switchLogLevel(LogLevel))
@@ -90,9 +83,9 @@ func Initialization(LogLevel, LogOutput, LogOutputFile string) *zap.Logger {
 		AtomicLevel, // 日志级别
 	)
 
-	zapLogger = zap.New(core, zap.AddCaller(), zap.Development())
+	Logger = zap.New(core, zap.AddCaller(), zap.Development())
 
-	zapLogger.Info("init zap logger. ", zap.String("Level", AtomicLevel.String()))
+	Logger.Info("init zap logger. ", zap.String("Level", AtomicLevel.String()))
 
-	return zapLogger
+	return Logger
 }

@@ -1,10 +1,9 @@
 package config
 
 import (
-	"errors"
-	"fmt"
 	"os"
 
+	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -33,7 +32,7 @@ func GetLogOutput() string {
 func GetLogOutputFile() string {
 	return config.LogOutputFile
 }
-func init() {
+func SetupInit() {
 	if err := initConfig(); err != nil {
 		panic(err)
 	}
@@ -52,7 +51,7 @@ func initConfig() error {
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
-			fmt.Println(err)
+			return
 		}
 	}()
 
@@ -84,53 +83,12 @@ func GetSecretKey() string {
 }
 
 func GetTemplatePath() string {
+	if config.TemplatePath == "" {
+		return "/etc/prometheus-alertmanager-dingtalk/dingtalk.tmpl"
+	}
 	return config.TemplatePath
 }
 
 func GetAllowLables() []string {
 	return config.AllowLables
-}
-
-func GetTemplateText() string {
-	return `
-{{ define "__title__" -}}
-[{{ .Status | ToUpper }}{{ if eq .Status "firing" }}:{{ .Alerts | len }}{{ end }}] {{ index .GroupLabels.AlertName }}
-{{- end }}
-
-
-{{ define "__alertmanagerURL" -}}
-{{ .ExternalURL }}/#/alerts?receiver={{ .Receiver }}
-{{- end }}
-
-
-{{ define "__content__" -}}
-#### **\[{{ .Status | ToUpper }}{{ if eq .Status "firing" }}:{{ .Alerts | len }}{{ end }}\]** **[{{ index .GroupLabels.AlertName }}]({{ template "__alertmanagerURL" . }})**
-{{- end }}
-
-
-{{ define "__alerts_common_labels__" }}
-{{ range .SortedAllowPairs }}
-> **{{ .Name | Title }}**: {{ .Value | html }}
-{{ end }}
-{{- end }}
-
-
-{{ define "__alerts_instance_lists__" }}
-{{ range $i, $v := . }}
-##### **警报: {{ Increase $i }}**
-{{ range .Annotations.SortedAllowPairs }}
-> ##### **{{ .Name | Title }}**: {{ .Value | html }}
-{{ end }}
-> ###### Report From **[Prometheus]({{ .GeneratorURL }})** at **{{ FormatTime .StartsAt }}**
-{{- end }}
-![screenshot](https://prom.i-morefun.net/MaineCoon.jpg)
-{{- end }}
-
-
-{{ define "__text__" -}}
-{{ template "__content__" . }}
-{{ template "__alerts_common_labels__" .CommonLabels }}
-{{ template "__alerts_instance_lists__" .Alerts }}
-{{- end }}
-`
 }

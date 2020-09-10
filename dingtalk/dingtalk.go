@@ -6,8 +6,6 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -15,9 +13,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
 	"prometheus-alertmanager-dingtalk/config"
+	"prometheus-alertmanager-dingtalk/zaplog"
 )
 
 type DingTalk struct {
@@ -100,7 +100,7 @@ func (d *DingTalk) BuildAlertManagerMessagePayload(r *http.Request) (*bytes.Read
 		return nil, err
 	}
 
-	alertManagerMessage := new(AlertManagerMessage)
+	alertManagerMessage := NewAlertManagerMessage()
 	if err := json.Unmarshal(payload, &alertManagerMessage); err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ func (d *DingTalk) BuildAlertManagerMessagePayload(r *http.Request) (*bytes.Read
 		return nil, err
 	}
 
-	logger.Debug("Build AlertManagerMessage Payload From AlertManager Message Completed !",
+	zaplog.Logger.Debug("Build AlertManagerMessage Payload From AlertManager Message Completed !",
 		zap.String("Status", alertManagerMessage.Status),
 		zap.String("AlertName", alertManagerMessage.GroupLabels.AlertName),
 	)
@@ -166,11 +166,7 @@ func (d *DingTalk) SendAlertManagerMessage(r *http.Request) error {
 	}
 
 	if resp.StatusCode != 200 {
-		msg := fmt.Sprintf(
-			"Send Message Response StatusCode is not 200, StatusCode: %d",
-			resp.StatusCode,
-		)
-		return errors.New(msg)
+		return errors.Errorf("Send Message Response StatusCode is not 200, StatusCode: %d", resp.StatusCode)
 	}
 
 	payload, err := ioutil.ReadAll(resp.Body)
@@ -186,12 +182,10 @@ func (d *DingTalk) SendAlertManagerMessage(r *http.Request) error {
 		return err
 	}
 	if response.ErrorCode != 0 {
-		msg := fmt.Sprintf(
-			"Send Message Response ErrorCode is not zero, ErrorCode: %d, ErrorMessage: %s",
+		return errors.Errorf("Send Message Response ErrorCode is not zero, ErrorCode: %d, ErrorMessage: %s",
 			response.ErrorCode, response.ErrorMessage)
-		return errors.New(msg)
 	}
 
-	logger.Debug("Send AlertManagerMessage Payload To DingTalk Completed !")
+	zaplog.Logger.Debug("Send AlertManagerMessage Payload To DingTalk Completed !")
 	return nil
 }
