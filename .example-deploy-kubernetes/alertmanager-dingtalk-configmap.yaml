@@ -21,7 +21,7 @@ data:
     securitySettingsType: Endorsement
     secretKey: XXXXXXXXXXXXXXXXXXXXXXXXXXx
     
-    #templatePath: ./dingtalk.tmpl
+    templatePath: /etc/prometheus-alertmanager-dingtalk/dingtalk.tmpl
     
     allowLables:
       - severity
