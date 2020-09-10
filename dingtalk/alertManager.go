@@ -24,8 +24,7 @@ var (
 )
 
 func SetupInit() {
-	dingTalkTemplate = template.New("DingTalk").Funcs(funcMap)
-	dingTalkTemplate = template.Must(dingTalkTemplate.ParseFiles(config.GetTemplatePath()))
+	dingTalkTemplate = template.Must(template.New("DingTalk").Funcs(funcMap).ParseFiles(config.GetTemplatePath()))
 
 	DefaultDingTalk = New()
 }
