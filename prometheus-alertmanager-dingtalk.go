@@ -17,7 +17,6 @@ func init() {
 	zaplog.SetupInit()
 	dingtalk.SetupInit()
 
-
 	http.HandleFunc("/ready", dingtalk.HandlerReady)
 	http.HandleFunc("/healthy", dingtalk.HandlerHealthy)
 	http.HandleFunc("/dingtalk/alertmanager", dingtalk.HandlerAlertManager)
