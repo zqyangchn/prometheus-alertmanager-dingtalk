@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	Logger   *zap.Logger
+	Logger      *zap.Logger
 	AtomicLevel zap.AtomicLevel
 )
 

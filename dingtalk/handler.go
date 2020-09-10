@@ -2,13 +2,22 @@ package dingtalk
 
 import (
 	"net/http"
+	"text/template"
 
 	"go.uber.org/zap"
 
+	"prometheus-alertmanager-dingtalk/config"
 	"prometheus-alertmanager-dingtalk/zaplog"
 )
 
 var DefaultDingTalk *DingTalk
+
+func SetupInit() {
+	tmpl = template.Must(
+		template.New("DingTalk").Funcs(funcMap).ParseFiles(config.GetTemplatePath()))
+
+	DefaultDingTalk = NewDingTalk()
+}
 
 // Handler AlertManager WebHook Request, Send Message To DingTalk
 func HandlerAlertManager(w http.ResponseWriter, r *http.Request) {

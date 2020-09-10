@@ -20,21 +20,25 @@ var (
 		"Increase":   increase,
 		"FormatTime": formatTime,
 	}
-	dingTalkTemplate *template.Template
+
+	tmpl *template.Template
 )
 
-func SetupInit() {
-	dingTalkTemplate = template.Must(template.New("DingTalk").Funcs(funcMap).ParseFiles(config.GetTemplatePath()))
-
-	DefaultDingTalk = New()
+// 模板函数, 显示实例ID的时候增加1
+func increase(i int) int {
+	return i + 1
 }
 
-type Pair struct {
-	Name, Value string
+// alertManager 发送消息的时间UTC, 对于CST, 增加8小时, 并格式化时间的输出
+func formatTime(t time.Time) string {
+	return t.Add(8 * time.Hour).Format("2006-01-02 15:04:05")
 }
-type Pairs []Pair
 
-type KV map[string]string
+func NewAlertManagerMessage() *AlertManagerMessage {
+	return &AlertManagerMessage{
+		dingTalkTemplate: tmpl,
+	}
+}
 
 // 解析AlertManager json消息的结构体
 type AlertManagerMessage struct {
@@ -52,6 +56,7 @@ type AlertManagerMessage struct {
 
 	dingTalkTemplate *template.Template
 }
+type KV map[string]string
 
 type Alerts []Alert
 type Alert struct {
@@ -63,11 +68,10 @@ type Alert struct {
 	GeneratorURL string    `json:"generatorURL"`
 }
 
-func NewAlertManagerMessage() *AlertManagerMessage {
-	return &AlertManagerMessage{
-		dingTalkTemplate: dingTalkTemplate,
-	}
+type Pair struct {
+	Name, Value string
 }
+type Pairs []Pair
 
 // 对map类型转化成结构体, 允许特定的kv输出, 并排序
 func (kv KV) SortedAllowPairs() Pairs {
@@ -112,17 +116,7 @@ func (m *AlertManagerMessage) FilterFiringInformation() {
 	m.Alerts = firingAlerts
 }
 
-// 模板函数, 显示实例ID的时候增加1
-func increase(i int) int {
-	return i + 1
-}
-
-// alertManager 发送消息的时间UTC, 对于CST, 增加8小时, 并格式化时间的输出
-func formatTime(t time.Time) string {
-	return t.Add(8 * time.Hour).Format("2006-01-02 15:04:05")
-}
-
-func (m *AlertManagerMessage) ParseDingTalkTemplate() (string, string, error) {
+func (m *AlertManagerMessage) GenerateDingTalkTitleAndText() (string, string, error) {
 	var (
 		titleBuffer bytes.Buffer
 		textBuffer  bytes.Buffer

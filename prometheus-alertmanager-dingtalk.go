@@ -11,7 +11,6 @@ import (
 	"prometheus-alertmanager-dingtalk/zaplog"
 )
 
-
 func init() {
 	config.SetupInit()
 	zaplog.SetupInit()
@@ -25,9 +24,9 @@ func init() {
 func main() {
 	server := &http.Server{
 		Addr:              config.GetListenUri(),
-		ReadTimeout:       1 * time.Minute,
-		ReadHeaderTimeout: 20 * time.Second,
-		WriteTimeout:      2 * time.Minute,
+		ReadTimeout:       5 * time.Minute,
+		ReadHeaderTimeout: 5 * time.Second,
+		WriteTimeout:      5 * time.Minute,
 	}
 
 	zaplog.Logger.Debug("ConfigSetting",

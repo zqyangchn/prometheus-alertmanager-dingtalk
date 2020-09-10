@@ -20,37 +20,7 @@ import (
 	"prometheus-alertmanager-dingtalk/zaplog"
 )
 
-type DingTalk struct {
-	HC *http.Client
-
-	Uri string
-
-	// Dingtalk Security Settings Type
-	// 1. CustomKeywords		最多可以设置10个关键词，消息中至少包含其中1个关键词才可以发送成功
-	// 2. Endorsement			加签, 需要提供 SecretKey
-	// 3. IPAddressSegment		只有来自IP地址范围内的请求才会被正常处理
-	SecuritySettingsType string
-	SecretKey            string
-}
-
-// send to dingtalk json body struct
-type Notification struct {
-	MessageType string                `json:"msgtype"`
-	Markdown    *NotificationMarkdown `json:"markdown,omitempty"`
-	At          *NotificationAt       `json:"at,omitempty"`
-}
-
-type NotificationAt struct {
-	AtMobiles []string `json:"atMobiles,omitempty"`
-	IsAtAll   bool     `json:"isAtAll,omitempty"`
-}
-
-type NotificationMarkdown struct {
-	Title string `json:"title"`
-	Text  string `json:"text"`
-}
-
-func New() *DingTalk {
+func NewDingTalk() *DingTalk {
 	d := &DingTalk{
 		Uri: config.GetDingTalkUri(),
 		HC: &http.Client{
@@ -66,7 +36,7 @@ func New() *DingTalk {
 				ExpectContinueTimeout: 5 * time.Second,
 				ResponseHeaderTimeout: 5 * time.Second,
 			},
-			Timeout: 2 * time.Second,
+			Timeout: 5 * time.Second,
 		},
 	}
 
@@ -74,6 +44,34 @@ func New() *DingTalk {
 	d.SecretKey = config.GetSecretKey()
 
 	return d
+}
+
+type DingTalk struct {
+	HC *http.Client
+
+	Uri string
+
+	// DingTalk Security Settings Type
+	// 1. CustomKeywords		最多可以设置10个关键词，消息中至少包含其中1个关键词才可以发送成功
+	// 2. Endorsement			加签, 需要提供 SecretKey
+	// 3. IPAddressSegment		只有来自IP地址范围内的请求才会被正常处理
+	SecuritySettingsType string
+	SecretKey            string
+}
+
+// send to DingTalk json body struct
+type Notification struct {
+	MessageType string                `json:"msgtype"`
+	Markdown    *NotificationMarkdown `json:"markdown,omitempty"`
+	At          *NotificationAt       `json:"at,omitempty"`
+}
+type NotificationAt struct {
+	AtMobiles []string `json:"atMobiles,omitempty"`
+	IsAtAll   bool     `json:"isAtAll,omitempty"`
+}
+type NotificationMarkdown struct {
+	Title string `json:"title"`
+	Text  string `json:"text"`
 }
 
 func (d *DingTalk) MakeTimestamp() string {
@@ -104,8 +102,10 @@ func (d *DingTalk) BuildAlertManagerMessagePayload(r *http.Request) (*bytes.Read
 	if err := json.Unmarshal(payload, &alertManagerMessage); err != nil {
 		return nil, err
 	}
-	alertManagerMessage.FilterFiringInformation()
-	title, text, err := alertManagerMessage.ParseDingTalkTemplate()
+	if alertManagerMessage.Status == "firing" {
+		alertManagerMessage.FilterFiringInformation()
+	}
+	title, text, err := alertManagerMessage.GenerateDingTalkTitleAndText()
 	if err != nil {
 		return nil, err
 	}
