@@ -12,7 +12,7 @@ dingTalkUri: https://oapi.dingtalk.com/robot/send?access_token=XXXXXXX
 securitySettingsType: Endorsement
 secretKey: SECXXXXXXX
 
-#templatePath: ./dingtalk.tmpl
+templatePath: /etc/prometheus-alertmanager-dingtalk/dingtalk.tmpl
 
 allowLables:
   - severity

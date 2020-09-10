@@ -27,12 +27,13 @@ func main() {
 		WriteTimeout:      2 * time.Minute,
 	}
 
-	logger.Debug("ConfigSetting", zap.String("uri", config.GetDingTalkUri()))
-	logger.Debug("ConfigSetting", zap.String("securitySettingsType", config.GetSecuritySettingsType()))
-	logger.Debug("ConfigSetting", zap.String("secretKey", config.GetSecretKey()))
-	for _, label := range config.GetAllowLables() {
-		logger.Debug("ConfigSetting", zap.String("allowLabel", label))
-	}
+	logger.Debug("ConfigSetting",
+		zap.String("uri", config.GetDingTalkUri()),
+		zap.String("securitySettingsType", config.GetSecuritySettingsType()),
+		zap.String("secretKey", config.GetSecretKey()),
+		zap.String("templatePath", config.GetTemplatePath()),
+		zap.Strings("allowLabels", config.GetAllowLables()),
+	)
 
 	logger.Info("Web Starting Completed !", zap.String("ListenUri", config.GetListenUri()))
 	if err := server.ListenAndServe(); err != nil {

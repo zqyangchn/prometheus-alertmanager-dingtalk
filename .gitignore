@@ -16,4 +16,5 @@
 
 .idea/
 config.yaml
+docker-run-config.yaml
 prometheus-alertmanager-dingtalk
