@@ -1,7 +1,10 @@
 package main
 
 import (
+	"context"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 
 	"go.uber.org/zap"
@@ -22,7 +25,7 @@ func init() {
 }
 
 func main() {
-	server := &http.Server{
+	srv := &http.Server{
 		Addr:              config.GetListenUri(),
 		ReadTimeout:       5 * time.Minute,
 		ReadHeaderTimeout: 5 * time.Second,
@@ -37,8 +40,24 @@ func main() {
 		zap.Strings("allowLabels", config.GetAllowLables()),
 	)
 
-	zaplog.Logger.Info("Web Starting Completed !", zap.String("ListenUri", config.GetListenUri()))
-	if err := server.ListenAndServe(); err != nil {
-		panic(err.Error())
+	go func() {
+		zaplog.Logger.Info("Web Starting Completed !", zap.String("ListenUri", config.GetListenUri()))
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			zaplog.Logger.Fatal("web Server start Failed", zap.Error(err))
+		}
+	}()
+
+	// 等待中断信号以优雅地关闭服务器（设置 15 秒的超时时间）
+	osSignal := make(chan os.Signal)
+	signal.Notify(osSignal, os.Interrupt)
+	<-osSignal
+
+	// 启动服务器关闭流程
+	zaplog.Logger.Info("shutdown server ...")
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		zaplog.Logger.Fatal("Server Shutdown:", zap.Error(err))
 	}
+	zaplog.Logger.Info("server shutdown completed !")
 }
