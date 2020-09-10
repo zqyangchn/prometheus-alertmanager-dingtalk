@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 
-	"github.com/zqyangchn/webhook-alertmanager-call-dingtalk/config"
+	"prometheus-alertmanager-dingtalk/config"
 )
 
 var (

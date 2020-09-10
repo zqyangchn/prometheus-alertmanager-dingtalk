@@ -6,9 +6,9 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/zqyangchn/webhook-alertmanager-call-dingtalk/config"
-	"github.com/zqyangchn/webhook-alertmanager-call-dingtalk/dingtalk"
-	"github.com/zqyangchn/webhook-alertmanager-call-dingtalk/zaplog"
+	"prometheus-alertmanager-dingtalk/config"
+	"prometheus-alertmanager-dingtalk/dingtalk"
+	"prometheus-alertmanager-dingtalk/zaplog"
 )
 
 var logger = zaplog.Get()

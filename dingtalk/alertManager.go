@@ -9,8 +9,8 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/zqyangchn/webhook-alertmanager-call-dingtalk/config"
-	"github.com/zqyangchn/webhook-alertmanager-call-dingtalk/zaplog"
+	"prometheus-alertmanager-dingtalk/config"
+	"prometheus-alertmanager-dingtalk/zaplog"
 )
 
 var (

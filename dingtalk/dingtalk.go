@@ -17,7 +17,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/zqyangchn/webhook-alertmanager-call-dingtalk/config"
+	"prometheus-alertmanager-dingtalk/config"
 )
 
 type DingTalk struct {
