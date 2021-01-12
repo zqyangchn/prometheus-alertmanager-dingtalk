@@ -28,7 +28,7 @@
 {{ end }}
 > ###### Report From **[Prometheus]({{ .GeneratorURL }})** at **{{ FormatTime .StartsAt }}**
 {{- end }}
-![screenshot](https://prom.i-morefun.net/MaineCoon.jpg)
+![screenshot](https://prom.i-morefun.com/MaineCoon.jpg)
 {{- end }}
 
 
